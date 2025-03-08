@@ -1,0 +1,9 @@
+# Ignore all .pem files
+*.pem
+
+# Specifically ignore these key files
+pub.pem
+priv.pem
+
+# Ignore environment variables files
+.env
