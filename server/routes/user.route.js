@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require('../models/user.model.js');
 const { genPassword, verifyPassword } = require("../utils/password.utils.js");
 const userCreateValidator = require("../validation/userCreate.validation.js");
+const userLoginValidation = require("../validation/userLogin.validation.js");
 const checkValidation = require("../validation/check.validation.js");
 
 router.get('/', async (req, res) => {
@@ -14,7 +15,7 @@ router.get('/', async (req, res) => {
     }
 })
 
-router.post('/create', userCreateValidator, checkValidation, async (req, res) => {
+router.post('/register', userCreateValidator, checkValidation, async (req, res) => {
     try {
         const isTaken = await User.find( {$or: [{ name: req.body.name }, { email: req.body.email }]});
         if(isTaken.length > 0) return res.status(409).json({ message: "Username or email already taken"});
@@ -23,6 +24,13 @@ router.post('/create', userCreateValidator, checkValidation, async (req, res) =>
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
+});
+
+router.post('/login', userLoginValidation, checkValidation, async (req, res) => {
+    const user = await User.find({ $or: [{ name: req.body.login }, { email: req.body.login }]});
+    if(user.length > 0) return res.status(404).json({ message: "Invalid username/email" });
+    if(!verifyPassword(req.body.password, user.password)) return res.status(401).json({ message: "Invalid password" });
+    
 });
 
 module.exports = router;
