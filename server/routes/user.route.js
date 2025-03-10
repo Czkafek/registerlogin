@@ -5,6 +5,10 @@ const { genPassword, verifyPassword } = require("../utils/password.utils.js");
 const userCreateValidator = require("../validation/userCreate.validation.js");
 const userLoginValidation = require("../validation/userLogin.validation.js");
 const checkValidation = require("../validation/check.validation.js");
+const { createAccessToken, createRefreshToken } = require("../utils/jwt.utils.js");
+const fs = require('fs');
+const path = require('path');
+
 
 router.get('/', async (req, res) => {
     try {
@@ -27,10 +31,41 @@ router.post('/register', userCreateValidator, checkValidation, async (req, res) 
 });
 
 router.post('/login', userLoginValidation, checkValidation, async (req, res) => {
-    const user = await User.find({ $or: [{ name: req.body.login }, { email: req.body.login }]});
-    if(user.length > 0) return res.status(404).json({ message: "Invalid username/email" });
-    if(!verifyPassword(req.body.password, user.password)) return res.status(401).json({ message: "Invalid password" });
-    
+    try {
+        //const user = await User.find({ $or: [{ name: req.body.login }, { email: req.body.login }]});
+        const user = await User.findOne({ name: req.body.login });
+        if(!user) return res.status(404).json({ message: "Invalid username/email" });
+        if(!verifyPassword(req.body.password, user.password)) return res.status(401).json({ message: "Invalid password" });
+        const accessToken = createAccessToken(user._id);
+        const refreshToken = createRefreshToken(user._id);
+        user.refreshtoken = refreshToken;
+        await user.save();
+        res.cookie('refreshtoken', refreshToken, {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'strict',
+            maxAge: 7*24*60*60*1000,
+            path: '/refresh_token'
+        });
+        res.status(200).json({ accessToken, message: "User has been successfully logged in" });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
+
+router.post('/logout', async (req, res) => {
+    try {
+        await User.findByIdAndUpdate(req.body.id, {
+            refreshToken: null
+        });
+        res.clearCookie('refreshtoken');
+        return res.json({ message: "User has been logged out" });
+    } catch (err) {
+        res.status(500).json({ message: err });
+    }
+});
+
+
+
 
 module.exports = router;

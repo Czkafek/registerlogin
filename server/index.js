@@ -6,12 +6,14 @@ const port = 3000;
 const URI = "mongodb://localhost:27017/loginregister"
 
 const userRoute = require("./routes/user.route.js");
+const authorizationRoute = require("./routes/authorization.route.js");
 
 app.use(express.json());
 app.use(cookieParser());
 
 // ROUTES
 app.use("/api/user", userRoute);
+app.use("/auth", authorizationRoute);
 
 mongoose.connect(URI)
 .then(() => console.log("Successfully connected to MongoDB"))

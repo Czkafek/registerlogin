@@ -14,6 +14,10 @@ const UserSchema = mongoose.Schema(
             type: String,
             required: [true, "Email field is required"]
         },
+        refreshtoken: {
+            type: String,
+            default: null
+        }
     }
 );
 
