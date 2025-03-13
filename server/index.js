@@ -3,11 +3,13 @@ const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
 const app = express();
 const port = 3000;
-const URI = "mongodb://localhost:27017/loginregister"
+const URI = "mongodb://localhost:27017/loginregister";
+const cors = require('cors');
 
 const userRoute = require("./routes/user.route.js");
 const authorizationRoute = require("./routes/authorization.route.js");
 
+app.use(cors({ origin: "http://localhost:5173" }));
 app.use(express.json());
 app.use(cookieParser());
 

@@ -1,9 +1,11 @@
 import styles from './RegisterPage.module.css'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react';
 import validator from 'validator'
+import axios from 'axios'
 
 function RegisterPage() {
+    const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
         username: '',
@@ -12,15 +14,15 @@ function RegisterPage() {
         error: ''
     });
 
-    const [username, setUsername] = useState();
-    const [email, setEmail] = useState();
-    const [password, setPassword] = useState();
+    const fetchAPI = async () => {
+        const response = await axios.post("http://localhost:3000/api/user/register", {name: formData.username, email: formData.email, password: formData.password});
+        console.log(response.status);
+        if(response.status === 200)
+            navigate('/login');
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log(formData.username);
-        console.log(formData.email);
-        console.log(formData.password);
         if (formData.username.length < 3)
             return setFormData(data => ({ ...data, error: "Invalid username"}));
         if (formData.email.length < 3 || !validator.isEmail(formData.email))
@@ -30,7 +32,8 @@ function RegisterPage() {
             !/[a-z]/.test(formData.password) ||  // mała litera
             !/[0-9]/.test(formData.password))  //  cyfra
             return setFormData(data => ({ ...data, error: "Invalid password"}));
-        return setFormData(data => ({ ...data, error: ""}));
+        setFormData(data => ({ ...data, error: ""}));
+        fetchAPI();
     }
 
     const handleChange = (e) => {
@@ -43,9 +46,9 @@ function RegisterPage() {
     return <>
         <form onSubmit={handleSubmit}>
             <h1>Register</h1>
-            <input type="text" name='username' value={username} onChange={handleChange} placeholder="Username" />
-            <input type="text" name='email' value={email} onChange={handleChange} placeholder="Email" />
-            <input type="password" name='password' value={password} onChange={handleChange} placeholder="Password" />
+            <input type="text" name='username' value={formData.username} onChange={handleChange} placeholder="Username" />
+            <input type="text" name='email' value={formData.email} onChange={handleChange} placeholder="Email" />
+            <input type="password" name='password' value={formData.password} onChange={handleChange} placeholder="Password" />
             {formData.error && <p className={styles.error}>{formData.error}</p>}
             <button>Register</button>
             <Link to={'/Login'} >Already have an account? Login</Link>
