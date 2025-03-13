@@ -46,7 +46,7 @@ function RegisterPage() {
             <input type="text" name='username' value={username} onChange={handleChange} placeholder="Username" />
             <input type="text" name='email' value={email} onChange={handleChange} placeholder="Email" />
             <input type="password" name='password' value={password} onChange={handleChange} placeholder="Password" />
-            {formData.error && <p>{formData.error}</p>}
+            {formData.error && <p className={styles.error}>{formData.error}</p>}
             <button>Register</button>
             <Link to={'/Login'} >Already have an account? Login</Link>
             </form>

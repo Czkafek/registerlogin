@@ -22,7 +22,7 @@ form input {
 
 button {
     width: 100%;
-    border: 1px solid #fafafa;
+    border: none;
     border-radius: 4px;
     padding: 12px 0px;
     background-color: #181818;
@@ -32,20 +32,19 @@ button {
     transition: background-color, 0.1s;
 }
 button:hover {
-    background-color: #1f1f1f;
+    background-color: #ebebeb;
 }
 button:active {
-    background-color: #303030;
+    background-color: #e2e2e2;
 }
-
 h1 {
-    color: #fafafa;
-    font-size: 32px;
-    margin: 0px 0px 32px 0px;
+    color: #181818 !important;
+    font-size: 32px !important;
+    margin: 0px 0px 32px 0px !important;
 }
 
 a {
     font-size: 16px;
-    color: #fafafa;
-    text-decoration-color: #cacaca;
+    color: #181818 !important;
+    text-decoration-color: #1d1d1d;
 }

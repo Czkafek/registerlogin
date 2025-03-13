@@ -8,7 +8,7 @@ function LoginPage() {
             <input type="text" placeholder="Username or Email" />
             <input type="text" placeholder="Password" />
             <button>Login</button>
-            <Link to={'/Register'}>Doesn't have account yet? Register</Link>
+            <Link to={'/Register'}>Need a new account? Register</Link>
         </form>
     </>;
 }
