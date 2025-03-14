@@ -15,10 +15,16 @@ function RegisterPage() {
     });
 
     const fetchAPI = async () => {
-        const response = await axios.post("http://localhost:3000/api/user/register", {name: formData.username, email: formData.email, password: formData.password});
-        console.log(response.status);
-        if(response.status === 200)
+        try {
+            const response = await axios.post("http://localhost:3000/api/user/register", {name: formData.username, email: formData.email, password: formData.password});
             navigate('/login');
+        } catch (err) {
+            if(err.status === 400) {
+                setFormData(data => ({...data, error: err.response.data.error[0].msg}))
+            }
+            if(err.status === 409)
+                setFormData(data => ({...data, error: err.response.data.error}))
+        }
     };
 
     const handleSubmit = (e) => {

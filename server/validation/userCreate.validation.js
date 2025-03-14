@@ -15,10 +15,10 @@ const userCreateValidator = [
     .notEmpty().withMessage("Password field is required")
     .isLength({ min: 8 }).withMessage("Password must be at least 8 characters long")
     .custom( value => {
-        if (!/[a-z]/.test(value)) throw new Error("Password must contain at least one lowercase letter");
-        if (!/[A-Z]/.test(value)) throw new Error("Password must contain at least one uppercase letter");
-        if (!/[0-9]/.test(value)) throw new Error("Password must contain at least one number");
-        if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(value)) throw new Error("Password must contain at least one special character");
+        if (!/[a-z]/.test(value)) throw new Error("Invalid password");
+        if (!/[A-Z]/.test(value)) throw new Error("Invalid password");
+        if (!/[0-9]/.test(value)) throw new Error("Invalid password");
+        if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(value)) throw new Error("Invalid password");
         return true;
     })
 ];

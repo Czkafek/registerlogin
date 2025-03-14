@@ -1,14 +1,34 @@
 import styles from './LoginPage.module.css'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react';
+import axios from 'axios'
 
 function LoginPage() {
     
+    const navigate = useNavigate();
+
     const [formData, setFormData] = useState({
         login: '',
         password: '',
         error: ''
     });
+
+    const fetchAPI = async () => {
+        try {
+            const response = await axios.post("http://localhost:3000/api/user/login", {login: formData.login, password: formData.password});
+            console.log(response);
+            const token = response.data.accessToken;
+            localStorage.setItem('jsonwebtoken', token);
+            navigate('/');
+        } catch (err) {
+            if(err.status === 400) {
+                setFormData(data => ({...data, error: err.response.data.error[0].msg}))
+            }
+            else {
+                setFormData(data => ({...data, error: err.response.data.error}))
+            }
+        }
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -19,7 +39,8 @@ function LoginPage() {
             !/[a-z]/.test(formData.password) ||  // mała litera
             !/[0-9]/.test(formData.password))  //  cyfra
             return setFormData(data => ({ ...data, error: "Invalid password"}));
-        return setFormData(data => ({ ...data, error: ""}));
+        setFormData(data => ({ ...data, error: ""}));
+        fetchAPI();
     }
 
     const handleChange = (e) => {

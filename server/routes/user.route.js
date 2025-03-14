@@ -5,12 +5,12 @@ const { genPassword, verifyPassword } = require("../utils/password.utils.js");
 const userCreateValidator = require("../validation/userCreate.validation.js");
 const userLoginValidation = require("../validation/userLogin.validation.js");
 const checkValidation = require("../validation/check.validation.js");
-const { createAccessToken, createRefreshToken } = require("../utils/jwt.utils.js");
+const { createAccessToken, createRefreshToken, authorize } = require("../utils/jwt.utils.js");
 const fs = require('fs');
 const path = require('path');
 
 
-router.get('/', async (req, res) => {
+router.get('/', authorize, async (req, res) => {
     try {
         const users = await User.find({});
         res.status(200).json(users);
@@ -22,9 +22,9 @@ router.get('/', async (req, res) => {
 router.post('/register', userCreateValidator, checkValidation, async (req, res) => {
     try {
         const isTaken = await User.find( {$or: [{ name: req.body.name }, { email: req.body.email }]});
-        if(isTaken.length > 0) return res.status(409).json({ message: "Username or email already taken"});
+        if(isTaken.length > 0) return res.status(409).json({ error: "Username or email already taken"});
         await User.create({ name: req.body.name, password: await genPassword(req.body.password), email: req.body.email });
-        res.status(200).json({ message: "User has been successfully created" });
+        res.status(200).json({ error: "User has been successfully created" });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -34,8 +34,8 @@ router.post('/login', userLoginValidation, checkValidation, async (req, res) => 
     try {
         //const user = await User.find({ $or: [{ name: req.body.login }, { email: req.body.login }]});
         const user = await User.findOne({ name: req.body.login });
-        if(!user) return res.status(404).json({ message: "Invalid username/email" });
-        if(!verifyPassword(req.body.password, user.password)) return res.status(401).json({ message: "Invalid password" });
+        if(!user) return res.status(404).json({ error: "Invalid username/email" });
+        if(!await verifyPassword(req.body.password, user.password)) return res.status(401).json({ error: "Invalid password" });
         const accessToken = createAccessToken(user._id);
         const refreshToken = createRefreshToken(user._id);
         user.refreshtoken = refreshToken;
@@ -47,9 +47,9 @@ router.post('/login', userLoginValidation, checkValidation, async (req, res) => 
             maxAge: 7*24*60*60*1000,
             path: '/refresh_token'
         });
-        res.status(200).json({ accessToken, message: "User has been successfully logged in" });
+        res.status(200).json({ accessToken, error: "User has been successfully logged in" });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: err.error });
     }
 });
 
@@ -59,9 +59,9 @@ router.post('/logout', async (req, res) => {
             refreshToken: null
         });
         res.clearCookie('refreshtoken');
-        return res.json({ message: "User has been logged out" });
+        return res.json({ error: "User has been logged out" });
     } catch (err) {
-        res.status(500).json({ message: err });
+        res.status(500).json({ error: err });
     }
 });
 
