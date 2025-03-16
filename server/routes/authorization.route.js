@@ -42,7 +42,6 @@ router.post('/refresh_token', async (req, res) => {
         path: '/refresh_token'
     });
     res.status(200).json({ accessToken });
-    // Something (I dont know why but I this fucking client folder is in use so I can not delete it)
 });
 
 module.exports = router;
