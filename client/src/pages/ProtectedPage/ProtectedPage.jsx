@@ -16,7 +16,7 @@ function ProtectedPage() {
                     'Authorization': `Bearer ${localStorage.getItem('jsonwebtoken')}`
                 }
             };
-            const response = await axios.get("http://localhost:3000/api/user/", config);
+            const response = await axios.get("http://localhost:3000/api/", config);
             setUsers(response.data);
         } catch (err) {
             navigate('/login');

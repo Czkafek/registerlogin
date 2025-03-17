@@ -15,7 +15,7 @@ function LoginPage() {
 
     const fetchAPI = async () => {
         try {
-            const response = await axios.post("http://localhost:3000/api/user/login", {login: formData.login, password: formData.password});
+            const response = await axios.post("http://localhost:3000/api/login", {login: formData.login, password: formData.password});
             console.log(response);
             const token = response.data.accessToken;
             localStorage.setItem('jsonwebtoken', token);

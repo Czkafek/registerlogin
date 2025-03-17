@@ -16,7 +16,7 @@ function RegisterPage() {
 
     const fetchAPI = async () => {
         try {
-            const response = await axios.post("http://localhost:3000/api/user/register", {name: formData.username, email: formData.email, password: formData.password});
+            const response = await axios.post("http://localhost:3000/api/register", {name: formData.username, email: formData.email, password: formData.password});
             navigate('/login');
         } catch (err) {
             if(err.status === 400) {
