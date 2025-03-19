@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import styles from './ProtectedPage.module.css'
 import { useNavigate } from 'react-router-dom'
-import axios from 'axios'
+import api from '../../api.js'
 
 function ProtectedPage() {
 
@@ -16,10 +16,10 @@ function ProtectedPage() {
                     'Authorization': `Bearer ${localStorage.getItem('jsonwebtoken')}`
                 }
             };
-            const response = await axios.get("http://localhost:3000/api/", config);
+            const response = await api.get("/api/", config);
             setUsers(response.data);
         } catch (err) {
-            navigate('/login');
+            console.log(err);
         }
     };
 

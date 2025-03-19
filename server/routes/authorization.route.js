@@ -20,6 +20,7 @@ router.get('/protected', async (req, res) => {
 
 router.post('/refresh_token', async (req, res) => {
     const token = req.cookies.refreshtoken;
+    console.log("Cookies received:", req.cookies);
     if (!token) return res.status(401).json({ error: "cookies error", accesstoken: '' });
     let payload = null;
     try {
@@ -27,19 +28,20 @@ router.post('/refresh_token', async (req, res) => {
     } catch (err) {
         res.status(500).json({ error: err });
     }
+    console.log(payload);
     const user = await User.findById(payload.userId);
-    if (!user) return res.status(401).json({ accesstoken: ''});
-    if (user.refreshtoken !== token) return res.status(401).json({ accesstoken: '' });
-    const accessToken = createAccessToken();
-    const refreshToken = createRefreshToken();
+    if (!user) return res.status(401).json({ error: 'user error', accesstoken: ''});
+    if (user.refreshToken !== token) return res.status(401).json({ error: 'database error', accesstoken: '' });
+    const accessToken = createAccessToken(user._id);
+    const refreshToken = createRefreshToken(user._id);
     user.refreshToken = refreshToken;
     await user.save();
     res.cookie('refreshtoken', refreshToken, {
         httpOnly: true,
-        secure: true,
-        sameSite: 'strict',
+        secure: false,
+        sameSite: 'lax',
         maxAge: 7*24*60*60*1000,
-        path: '/refresh_token'
+        path: '/'
     });
     res.status(200).json({ accessToken });
 });

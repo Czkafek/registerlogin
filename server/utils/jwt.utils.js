@@ -5,7 +5,7 @@ const User = require("../models/user.model.js");
 
 const createAccessToken = userId => {
     return sign({ userId }, fs.readFileSync(path.join(__dirname, '../priv.pem'), 'utf8'), {
-        expiresIn: '5m',
+        expiresIn: '1m',
         algorithm: 'RS256'
     })
 }

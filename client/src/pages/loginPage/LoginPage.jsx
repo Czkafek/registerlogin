@@ -2,6 +2,7 @@ import styles from './LoginPage.module.css'
 import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react';
 import axios from 'axios'
+import api from '../../api.js'
 
 function LoginPage() {
     
@@ -15,7 +16,7 @@ function LoginPage() {
 
     const fetchAPI = async () => {
         try {
-            const response = await axios.post("http://localhost:3000/api/login", {login: formData.login, password: formData.password});
+            const response = await api.post("/api/login", {login: formData.login, password: formData.password, withCredentials: true});
             console.log(response);
             const token = response.data.accessToken;
             localStorage.setItem('jsonwebtoken', token);

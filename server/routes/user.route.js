@@ -32,21 +32,21 @@ router.post('/register', userCreateValidator, checkValidation, async (req, res) 
 
 router.post('/login', userLoginValidation, checkValidation, async (req, res) => {
     try {
-        //const user = await User.find({ $or: [{ name: req.body.login }, { email: req.body.login }]});
         const user = await User.findOne({ name: req.body.login });
         if(!user) return res.status(404).json({ error: "Invalid username/email" });
         if(!await verifyPassword(req.body.password, user.password)) return res.status(401).json({ error: "Invalid password" });
         const accessToken = createAccessToken(user._id);
         const refreshToken = createRefreshToken(user._id);
-        user.refreshtoken = refreshToken;
+        user.refreshToken = refreshToken;
         await user.save();
         res.cookie('refreshtoken', refreshToken, {
             httpOnly: true,
-            secure: true,
-            sameSite: 'strict',
+            secure: false,
+            sameSite: 'lax',
             maxAge: 7*24*60*60*1000,
-            path: '/refresh_token'
+            path: '/'
         });
+        console.log("Cookie set in login:", refreshToken.substring(0, 15) + "...");
         res.status(200).json({ accessToken, error: "User has been successfully logged in" });
     } catch (err) {
         res.status(500).json({ error: err.error });

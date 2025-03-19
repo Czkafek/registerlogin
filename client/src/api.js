@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from "jwt-decode";
 
 const api = axios.create({
     baseURL: 'http://localhost:3000',
@@ -8,73 +8,58 @@ const api = axios.create({
 
 const refreshToken = async () => {
     try {
-        const respone = await axios.post('http://localhost:300/auth/refresh_token', {}, {
+        const response = await axios.post('http://localhost:3000/auth/refresh_token', {}, {
             withCredentials: true
-        })
-        localStorage.setItem('jsonwebtoken', response.data.accessToken);
-        return response.data.accessToken;
+        });
+        if (response.data && response.data.accessToken) {
+            localStorage.setItem('jsonwebtoken', response.data.accessToken);
+            return response.data;
+        } else {
+            console.log("Hej");
+            throw new Error("No access token in response");
+        }
     } catch (err) {
+        console.error("Refresh token error:", err);
         throw err;
     }
 };
 
-api.interceptors.request.use(
-    config => {
-        const token = localStorage.getItem('jsonwebtoken');
-        if (token) config.headers['Authorization'] = `Bearer ${token}`;
-        return configl
-    },
-    error => Promise.reject(error)
-);
+api.interceptors.request.use(async (config) => {
 
-let isRefreshing = false;
-let failedQueue = [];
+    if (config.url === '/api/login' || config.url === '/auth/refresh_token') {
+        return config;
+    }
 
-const processQueue = (error, token = null) => {
-    failedQueue.forEach(prom => {
-        if (error) prom.reject(error);
-        else prom.resolve(token);
-    });
-
-    failedQueue = [];
-};
-
-api.interceptors.response.use(
-    response => response,
-    async error => {
-        const originalRequest = error.config;
-
-        if(error.response?.status === 401 && !originalRequest._retry) {
-            if (isRefreshing) {
-                return new Promise((resolve, reject) => {
-                    failedQueue.push({ resolve, reject });
-                })
-                .then(token => {
-                    originalRequest.headers['Authorization'] = `Bearer ${token}`;
-                    return api(originalRequest);
-                })
-                .catch(err => Promise.reject(err));
-            }
-
-            originalRequest._retry = true;
-            isRefreshing = true;
-
-            try {
-                const newToken = await refreshToken();
-                api.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
-                originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
-                processQueue(null, newToken);
-                isRefreshing = false;
-                return api(originalRequest);
-            } catch (refreshError) {
-                processQueue(refreshError, null);
-                isRefreshing = false;
-                localStorage.removeItem('jsonwebtoken');
-                window.location.href = '/login';
-                return Promise.reject(refreshError);
-            }
+    const token = localStorage.getItem('jsonwebtoken');
+    if(!token) {
+        try {
+            const response = await refreshToken();
+            if (response && response.accessToken)
+                config.headers['Authorization'] = "Bearer " + response.accessToken;
+        } catch (err) {
+            console.log("No token available and refresh failed: " + err);
         }
     }
-);
+    else {
+        let currentDate = new Date();
+        const decodedToken = jwtDecode(token);
+        if (decodedToken.exp * 1000 < currentDate.getTime()) {
+            try {
+                const response = await refreshToken();
+                if (response && response.accessToken) 
+                    config.headers['Authorization'] = "Bearer " + response.accessToken;
+            } catch (err) {
+                console.log("Token expired and refresh failed: " + err);
+            }
+        }
+        else 
+            config.headers['Authorization'] = "Bearer " + token;
+    }
+
+    return config;
+}, (error) => {
+    return Promise.reject(error);
+});
+
 
 export default api;
