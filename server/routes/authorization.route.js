@@ -32,7 +32,7 @@ router.post('/refresh_token', async (req, res) => {
     console.log("Cookies:  " + token);
     console.log("Database:  " + user.refreshToken);
     if (!user) return res.status(401).json({ error: 'user error', accesstoken: ''});
-    if (process.env.NODE_ENV !== 'development' && user.refreshToken !== token) return res.status(401).json({ error: 'database error', accesstoken: '' });
+    if (user.refreshToken !== token) return res.status(401).json({ error: 'database error', accesstoken: '' });
     const accessToken = createAccessToken(user._id);
     const refreshToken = createRefreshToken(user._id);
     user.refreshToken = refreshToken;
