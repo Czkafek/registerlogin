@@ -5,6 +5,7 @@ const app = express();
 const port = 3000;
 const URI = "mongodb://localhost:27017/loginregister";
 const cors = require('cors');
+const User = require("./models/user.model.js");
 
 const userRoute = require("./routes/user.route.js");
 const authorizationRoute = require("./routes/authorization.route.js");
@@ -42,7 +43,11 @@ app.get('/test-cookie', (req,res) => {
     });
     res.send("Test cookie set");
 });
-app.get("/check-cookies", (req, res) => {
+app.get("/check-cookies", async (req, res) => {
     console.log("All cookies: ", req.cookies);
+    const user = await User.findOne({name: 'Dawid'});
+    console.log(user.refreshToken);
+    if(user.refreshToken === req.cookies.refreshtoken)
+        console.log(true);
     res.json({ cookies: req.cookies });
 })
