@@ -44,7 +44,7 @@ router.post('/login', userLoginValidation, checkValidation, async (req, res) => 
             secure: false,
             sameSite: 'lax',
             maxAge: 7*24*60*60*1000,
-            path: '/auth'
+            path: '/'
         });
         console.log("Cookie set in login:", refreshToken.substring(0, 15) + "...");
         res.status(200).json({ accessToken, error: "User has been successfully logged in" });
