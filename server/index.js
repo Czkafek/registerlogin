@@ -49,5 +49,7 @@ app.get("/check-cookies", async (req, res) => {
     console.log(user.refreshToken);
     if(user.refreshToken === req.cookies.refreshtoken)
         console.log(true);
+    else
+        console.log(false);
     res.json({ cookies: req.cookies });
 })
