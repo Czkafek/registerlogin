@@ -32,7 +32,6 @@ function ProtectedPage() {
                 console.log(err);
                 setError('Failed to fetch data');
                 setLodaing(false);
-                navigate('/login');
             }
         };
 
@@ -43,6 +42,17 @@ function ProtectedPage() {
         };
  
     }, [navigate])
+
+    const handleClick = () => {
+        const fetchAPI = async () => {
+            try {
+                const response = await api.post('/api/logout');
+                navigate('/login');
+            } catch (err) {
+                console.log(err);
+            }
+        };
+    }
 
     if (loading) return <div><h1>Lodaing...</h1></div>
     if (error) return <div><h1>Error: {error}</h1></div>
@@ -56,6 +66,7 @@ function ProtectedPage() {
                 return <div key={index} className={styles.user}><p>{user.name}</p><p>{user.email}</p><p>{user.password}</p></div>
             })}
         </div>
+        <button onClick={handleClick} className={styles.logout}>Logout</button>
     </div>
 }
 

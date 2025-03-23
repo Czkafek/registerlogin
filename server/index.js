@@ -53,3 +53,12 @@ app.get("/check-cookies", async (req, res) => {
         console.log(false);
     res.json({ cookies: req.cookies });
 })
+
+app.get("/clear-cookies", (req, res) => {
+    try {
+        res.clearCookie('refreshtoken');
+        return res.json({ message: "Cookies has been cleared" });
+    } catch (err) {
+        res.status(500).json({ error: err });
+    }
+})

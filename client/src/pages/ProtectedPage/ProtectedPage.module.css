@@ -56,4 +56,8 @@ form input {
     background-color: #fafafa;
     outline-width: 1px;
     outline-color: #b6b6b6;
-  }
+}
+
+.logout {
+    width: 308px;
+}
