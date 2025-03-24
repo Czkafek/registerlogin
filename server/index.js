@@ -39,11 +39,11 @@ app.get('/test-cookie', (req,res) => {
     res.cookie('testcookie', 'testvalue', {
         httpOnly: true,
         secure: false,
-        path: '/'
+        path: '/auth'
     });
     res.send("Test cookie set");
 });
-app.get("/check-cookies", async (req, res) => {
+app.get("/get-cookies", async (req, res) => {
     console.log("All cookies: ", req.cookies);
     const user = await User.findOne({name: 'Dawid'});
     console.log(user.refreshToken);

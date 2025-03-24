@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import styles from './ProtectedPage.module.css'
 import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
 import api from '../../api.js'
 
 function ProtectedPage() {
@@ -32,6 +33,7 @@ function ProtectedPage() {
                 console.log(err);
                 setError('Failed to fetch data');
                 setLodaing(false);
+                navigate('/login');
             }
         };
 
@@ -46,15 +48,24 @@ function ProtectedPage() {
     const handleClick = () => {
         const fetchAPI = async () => {
             try {
-                const response = await api.post('/api/logout');
-                navigate('/login');
+                const config = {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('jsonwebtoken')}`
+                    }
+                };
+                const response = await axios.post('http://localhost:3000/api/logout/', config);
+                // const response = await api.post('/api/logout');
+                console.log(response);
+                console.log(localStorage.getItem('jsonwebtoken'));
+                //navigate('/login');
             } catch (err) {
                 console.log(err);
             }
         };
+        fetchAPI();
     }
 
-    if (loading) return <div><h1>Lodaing...</h1></div>
+    if (loading) return <div><h1>Loading...</h1></div>
     if (error) return <div><h1>Error: {error}</h1></div>
 
     return <div className={styles.ProtectedPageContainer}>

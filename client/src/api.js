@@ -26,14 +26,14 @@ const refreshToken = async () => {
 
 api.interceptors.request.use(async (config) => {
 
-    if (config.url === '/api/login' || config.url === '/auth/refresh_token') {
+    if (config.url === '/api/login' || config.url === '/auth/refresh_token' || config.url === '/api/logout') {
         return config;
     }
 
     const token = localStorage.getItem('jsonwebtoken');
     if(!token) {
         try {
-            const response = await refreshToken();
+        const response = await refreshToken();
             if (response && response.accessToken)
                 config.headers['Authorization'] = "Bearer " + response.accessToken;
         } catch (err) {

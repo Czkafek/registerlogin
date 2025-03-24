@@ -44,9 +44,8 @@ router.post('/login', userLoginValidation, checkValidation, async (req, res) => 
             secure: false,
             sameSite: 'lax',
             maxAge: 7*24*60*60*1000,
-            path: '/'
+            path: '/auth'
         });
-        console.log("Cookie set in login:", refreshToken.substring(0, 15) + "...");
         res.status(200).json({ accessToken, error: "User has been successfully logged in" });
     } catch (err) {
         res.status(500).json({ error: err.error });
@@ -55,11 +54,17 @@ router.post('/login', userLoginValidation, checkValidation, async (req, res) => 
 
 router.post('/logout', async (req, res) => {
     try {
-        await User.findByIdAndUpdate(req.body.id, {
-            refreshToken: null
-        });
+        const authorization = req.headers;
+        console.log("-------------------------------------------------------------------------------------------")
+        console.log(authorization);
+        console.log("-------------------------------------------------------------------------------------------")
+        const user = await User.findById(req.body.id)
+        /*const user = await User.findByIdAndUpdate(req.body.id, {
+            refreshtoken: ""
+        });*/
+        console.log(user);
         res.clearCookie('refreshtoken');
-        return res.json({ error: "User has been logged out" });
+        return res.json({ message: "User has been logged out" });
     } catch (err) {
         res.status(500).json({ error: err });
     }
